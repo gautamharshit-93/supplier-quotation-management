@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <style>
+      .bg { fill: #f2f4f7; }
+      .panel { fill: #ffffff; stroke: #dde3eb; }
+      .soft { fill: #eef2f6; }
+      .text { font-family: Arial, sans-serif; fill: #25354d; }
+      .muted { fill: #62728a; }
+      .header { fill: #eaf0f5; }
+      .row { fill: #ffffff; }
+      .rowAlt { fill: #f9fafb; }
+      .accent { fill: #1d7ef2; }
+    </style>
+  </defs>
+  <rect class="bg" width="1600" height="900"/>
+  <text x="70" y="70" class="text" style="font-size:34px;font-weight:700;">आइटम-वार मूल्य तुलना</text>
+
+  <rect x="50" y="100" width="1490" height="220" rx="12" class="panel"/>
+  <rect x="50" y="100" width="1490" height="42" rx="12" class="header"/>
+  <text x="80" y="130" class="text" style="font-size:16px; font-weight:700;">item_name</text>
+  <text x="430" y="130" class="text" style="font-size:16px; font-weight:700;">supplier_name</text>
+  <text x="980" y="130" class="text" style="font-size:16px; font-weight:700;">quantity</text>
+  <text x="1095" y="130" class="text" style="font-size:16px; font-weight:700;">unit</text>
+  <text x="1188" y="130" class="text" style="font-size:16px; font-weight:700;">unit_price</text>
+  <text x="1315" y="130" class="text" style="font-size:16px; font-weight:700;">total_price</text>
+
+  <g font-size="16" class="text">
+    <text x="80" y="180">Engine Mount Assembly</text>
+    <text x="80" y="215">Front Brake Disc</text>
+    <text x="80" y="250">Air Filter</text>
+    <text x="80" y="285">Shock Absorber</text>
+  </g>
+  <g font-size="16" class="muted">
+    <text x="430" y="180">ABC Automotive Pvt. Ltd.</text>
+    <text x="430" y="215">ABC Automotive Pvt. Ltd.</text>
+    <text x="430" y="250">ABC Automotive Pvt. Ltd.</text>
+    <text x="430" y="285">ABC Automotive Pvt. Ltd.</text>
+    <text x="980" y="180">500</text>
+    <text x="980" y="215">1000</text>
+    <text x="980" y="250">1500</text>
+    <text x="980" y="285">750</text>
+    <text x="1188" y="180">₹ 1,860.00</text>
+    <text x="1188" y="215">₹ 1,445.00</text>
+    <text x="1188" y="250">₹ 370.00</text>
+    <text x="1188" y="285">₹ 2,190.00</text>
+    <text x="1315" y="180">₹ 1,097,400</text>
+    <text x="1315" y="215">₹ 1,705,100</text>
+    <text x="1315" y="250">₹ 654,900</text>
+    <text x="1315" y="285">₹ 1,938,150</text>
+  </g>
+
+  <text x="70" y="390" class="text" style="font-size:30px; font-weight:700;">Unit price by item × supplier</text>
+  <rect x="50" y="420" width="1490" height="200" rx="12" class="panel"/>
+  <rect x="50" y="420" width="1490" height="40" class="header"/>
+  <text x="80" y="447" class="text" style="font-size:16px; font-weight:700;">item_name</text>
+  <text x="520" y="447" class="text" style="font-size:16px; font-weight:700;">Endurance Technologies Ltd.</text>
+  <text x="920" y="447" class="text" style="font-size:16px; font-weight:700;">Rico Auto Industries Ltd.</text>
+  <text x="1300" y="447" class="text" style="font-size:16px; font-weight:700;">Sundaram Auto Components Ltd.</text>
+
+  <g font-size="15" class="text">
+    <text x="80" y="500">Air Filter</text>
+    <text x="80" y="535">Engine Mount Assembly</text>
+    <text x="80" y="570">Front Brake Disc</text>
+  </g>
+  <g font-size="15" class="muted">
+    <text x="570" y="500">355</text>
+    <text x="570" y="535">1,795</text>
+    <text x="570" y="570">1,410</text>
+    <text x="990" y="500">365</text>
+    <text x="990" y="535">1,810</text>
+    <text x="990" y="570">1,405</text>
+    <text x="1390" y="500">350</text>
+    <text x="1390" y="535">1,780</text>
+    <text x="1390" y="570">1,390</text>
+  </g>
+
+  <text x="70" y="700" class="text" style="font-size:30px; font-weight:700;">प्रति आपूर्तिकर्ता कुल लागत</text>
+  <rect x="50" y="726" width="1490" height="120" rx="12" class="panel"/>
+  <rect x="140" y="760" width="200" height="70" rx="8" class="accent"/>
+  <rect x="630" y="760" width="220" height="70" rx="8" class="accent"/>
+  <rect x="1110" y="760" width="220" height="70" rx="8" class="accent"/>
+  <text x="205" y="803" class="text" style="fill:#ffffff; font-size:17px; font-weight:700;">46T</text>
+  <text x="715" y="803" class="text" style="fill:#ffffff; font-size:17px; font-weight:700;">47T</text>
+  <text x="1200" y="803" class="text" style="fill:#ffffff; font-size:17px; font-weight:700;">48T</text>
+</svg>

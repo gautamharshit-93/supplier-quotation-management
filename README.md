@@ -1,414 +1,155 @@
 # Supplier Quotation Management
 
-This project is a Streamlit-based procurement dashboard that helps a buyer compare supplier quotations against an RFQ (Request for Quotation), identify gaps, estimate cash outlay, answer document questions from the indexed content, and draft supplier emails.
+Procurement dashboard to compare RFQs with supplier quotations, detect gaps, estimate pricing, and draft supplier communication.
 
-It is designed to work in two modes:
+Built with Streamlit, Pandas, FAISS, and optional OpenAI.
 
-- Local / no-API mode: works immediately with no external keys
-- AI-assisted mode: uses OpenAI for better parsing, extraction, and multilingual Q&A when an API key is configured
+## Overview
 
-The main idea is simple: upload one RFQ and multiple supplier quotations, then let the app normalize the data, compare it side-by-side, and show which supplier is more compliant and cheaper.
+This app helps procurement teams:
 
----
+- upload one RFQ and multiple quotations
+- parse Excel, PDF, and Word files
+- extract structured fields like supplier, item list, quantities, unit price, terms, and warranty
+- compare suppliers item-wise and total cost-wise
+- flag missing RFQ requirements
+- estimate upfront payment from payment terms
+- ask questions over the indexed documents
+- generate email drafts in English or Hindi
 
-## 1. What problem this project solves
+## Real app flow
 
-In real procurement workflows, suppliers send quotations in different formats:
-
-- Excel sheets
-- PDFs
-- Word documents
-- sometimes mixed English/Hindi text
-- sometimes messy tables and inconsistent fields
-
-A buyer needs to know:
-
-- Which supplier quoted the lowest price for each item?
-- What is the total cost from each supplier?
-- Did the supplier miss any required items or required fields?
-- Is the quote compliant with the RFQ?
-- How much cash is needed upfront based on payment terms?
-- Which document contains the answer to a question?
-- What email should be sent to ask for missing information or award the order?
-
-This project centralizes these tasks in one workflow.
-
----
-
-## 2. High-level workflow
-
-The user flow is:
-
-1. Upload an RFQ file
-2. Upload one or more supplier quotation files
+1. Upload RFQ
+2. Upload supplier quotes
 3. Click Process documents
-4. The app parses each file
-5. It extracts structured data from each document
-6. It compares quotations with the RFQ
-7. It calculates totals, item-level prices, and gap scores
-8. It builds a vector index for retrieval-based Q&A
-9. It shows analysis tables and charts in the dashboard
-10. It can generate email drafts for follow-up or award
+4. System parses and normalizes each file
+5. Calculates item-wise comparison and total cost
+6. Checks RFQ compliance and gap score
+7. Builds FAISS vector index for search/Q&A
+8. Shows final recommendation and email draft
 
-This is implemented in [app.py](app.py), which is the main entry point.
+## Screenshots
 
----
+### Upload screen
 
-## 3. How the app works in practice
+![Upload screen](assets/upload-screen.svg)
 
-### 3.1 Upload step
+### Cost comparison
 
-The UI in [app.py](app.py) uses Streamlit to show:
+![Cost comparison](assets/cost-comparison.svg)
 
-- an RFQ uploader
-- a supplier quotation uploader
-- a Process documents button
+### Gap analysis
 
-When the button is clicked, the app does the following:
+![Gap analysis](assets/gap-analysis.svg)
 
-- saves the uploaded files in the storage folder
-- parses each file into raw text/tables
-- extracts normalized fields like supplier, dates, item list, totals, terms, and warranty
-- stores the processed results in memory for the session
-- builds a local vector index for question answering
+### Final recommendation
 
-### 3.2 Parsing stage
+![Final summary](assets/final-summary.svg)
 
-The parser dispatches based on file extension in [src/parsers/__init__.py](src/parsers/__init__.py):
+## Project structure
 
-- .xlsx / .xls -> Excel parser
-- .pdf -> PDF parser
-- .docx / .doc -> Word parser
+- app.py — main Streamlit dashboard
+- config.py — environment and settings
+- src/parsers — Excel/PDF/Word parsing
+- src/extraction — structured extraction logic
+- src/analysis — cost, gap, and investment calculations
+- src/vectorstore — FAISS indexing
+- src/chatbot — Q&A over indexed documents
+- src/mailer — email drafting and SMTP sending
+- src/storage — local/Azure storage abstraction
+- sample_data — demo RFQ and quotations
 
-Each parser converts raw documents into a common structure such as:
+## Without API
 
-- raw_text: flattened readable text
-- tables: extracted tabular data if available
-- sheets: Excel sheet rows if it is a workbook
-- source: file path
-- file_type: excel / pdf / docx
+The app still works without OpenAI.
 
-This standardization is critical, because all later modules expect a common document shape.
+It uses:
 
-### 3.3 Extraction stage
+- local parsers for Excel/PDF/Word
+- heuristic extraction from tables and key-value fields
+- Pandas calculations for totals and gaps
+- local FAISS embeddings for retrieval
 
-The extraction intelligence lives in [src/extraction/rfq_extractor.py](src/extraction/rfq_extractor.py).
+## With API
 
-This module turns raw text and tables into a normalized procurement schema such as:
+If `OPENAI_API_KEY` is configured, it improves:
 
-- supplier_name
-- quotation_ref
-- rfq_ref
-- deadline_date
-- currency
-- items[]
-- delivery_terms
-- delivery_lead_time_days
-- payment_terms
-- warranty
-- notes
+- extraction quality for messy PDFs and mixed-language docs
+- natural-language answers in English/Hindi
+- better AI-based structured parsing
 
-Each item is normalized to include:
+## Calculation logic
 
-- item_name
-- quantity
-- unit
-- unit_price
-- total_price
-- portion
-- packaging
+### Total cost
 
-#### Without OpenAI
+For each supplier:
 
-The project uses heuristic parsing based on:
+- sum item `total_price`
+- rank suppliers by total quoted cost
 
-- table headers
-- row/column keys
-- common keywords like Supplier, Item, Quantity, Unit Price, RFQ Ref, Deadline
-- date normalization formats like DD/MM/YYYY or YYYY-MM-DD
+### Gap score
 
-This works well for structured documents, especially Excel and clearly formatted tables.
+The app compares RFQ required items with supplier quote items and adds penalty points for:
 
-#### With OpenAI
+- missing items
+- missing fields
+- missing packaging or portion info
 
-If `OPENAI_API_KEY` is set, the app calls GPT to read raw text and return JSON that matches the procurement schema.
+Lower `gap_score` = better compliance.
 
-This is especially better for:
+### Final ranking
 
-- messy PDFs
-- mixed Hindi/English text
-- inconsistent layouts
-- free-form quotations
+Final recommendation uses:
 
-The local heuristic path is still used as a fallback if the LLM call fails.
+- 60% total cost
+- 40% RFQ compliance
 
----
+This is a decision-support ranking, not an automatic award.
 
-## 4. Project architecture
+## Email and multilingual support
 
-### Main app entry
+- English and Hindi UI
+- English/Hindi email drafting
+- real email sending only when SMTP credentials are configured
 
-- [app.py](app.py): Streamlit UI and orchestrator
+## Contributor / ownership
 
-### Configuration
+Owner and maintainer:
 
-- [config.py](config.py): loads environment variables and central settings
-- [.env.example](.env.example): template for optional API and cloud keys
+- Harshit Gautam
 
-### Storage layer
+Language used in the app UI and sample communication:
 
-- [src/storage/local_storage.py](src/storage/local_storage.py): default storage backend
-- [src/storage/azure_storage.py](src/storage/azure_storage.py): optional Azure upgrade path
-- [src/storage/__init__.py](src/storage/__init__.py): abstracted backend selection
+- English
+- Hindi (हिन्दी)
+- mixed bilingual workflow support
 
-The storage layer saves:
+## Setup
 
-- uploaded raw files
-- processed record metadata
-- local records database
+```bash
+python -m venv venv
+source venv/bin/activate   # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+streamlit run app.py
+```
 
-### Parsers
+Optional demo generation:
 
-- [src/parsers/excel_parser.py](src/parsers/excel_parser.py): parse Excel workbooks
-- [src/parsers/pdf_parser.py](src/parsers/pdf_parser.py): parse PDFs locally or via LlamaParse
-- [src/parsers/docx_parser.py](src/parsers/docx_parser.py): parse Word documents
-- [src/parsers/__init__.py](src/parsers/__init__.py): route to the right parser
+```bash
+python sample_data/generate_sample_data.py
+```
 
-### Analysis modules
+## Notes
 
-- [src/analysis/cost_comparison.py](src/analysis/cost_comparison.py): item-wise and supplier-wise comparison
-- [src/analysis/gap_analysis.py](src/analysis/gap_analysis.py): compliance and missing-information gap checks
-- [src/analysis/investment_calc.py](src/analysis/investment_calc.py): estimate upfront cash based on payment terms
-
-### Vector store and chatbot
-
-- [src/vectorstore/faiss_store.py](src/vectorstore/faiss_store.py): FAISS indexing and retrieval
-- [src/chatbot/query_bot.py](src/chatbot/query_bot.py): RAG-style Q&A over indexed docs
-
-### Email module
-
-- [src/mailer/email_sender.py](src/mailer/email_sender.py): render and optionally send emails in English/Hindi
-
-### Internationalization
-
-- [src/utils/i18n.py](src/utils/i18n.py): English/Hindi UI text support
+- Works out of the box without API keys
+- Best accuracy on structured Excel/Word tables
+- AI mode is recommended for messy PDFs and mixed-language documents
 
 ---
 
-## 5. What the system does with the data
+## License
 
-### 5.1 Cost comparison
-
-Once quotations are extracted, the app compares them item by item.
-
-For every supplier and every item, it reads:
-
-- item_name
-- quantity
-- unit
-- unit_price
-- total_price
-
-If total_price is not present but quantity and unit_price are present, it calculates:
-
-- total_price = quantity × unit_price
-
-This is done in [src/analysis/cost_comparison.py](src/analysis/cost_comparison.py).
-
-The app then creates:
-
-- item-wise comparison table
-- supplier-wise total cost summary
-- cheapest supplier per item
-- total quoted cost per supplier
-- bar charts for easy comparison
-
-### 5.2 Gap analysis
-
-The RFQ is treated as the required target, and each quotation is compared against it.
-
-The logic in [src/analysis/gap_analysis.py](src/analysis/gap_analysis.py) checks:
-
-- missing required items
-- missing fields such as payment terms, delivery terms, warranty, lead time
-- missing packaging or portion specifications
-- comparison against the RFQ deadline
-
-It creates a score called `gap_score`:
-
-- each missing item adds weight
-- each missing required field adds weight
-- missing packaging/portion adds smaller penalties
-
-Lower gap score = more complete and compliant quotation.
-
-### 5.3 Investment analysis
-
-The investment module in [src/analysis/investment_calc.py](src/analysis/investment_calc.py) estimates how much money must be paid upfront according to payment terms.
-
-Example logic:
-
-- if payment terms say “30% advance, balance on delivery”
-- and the total quoted cost is 100,000
-- then upfront_cash_required = 30,000
-- balance_on_delivery = 70,000
-
-If the advance percentage is not clearly specified, the project leaves it blank instead of guessing.
-
-### 5.4 Query bot / RAG
-
-The vector store indexes all parsed document text in [src/vectorstore/faiss_store.py](src/vectorstore/faiss_store.py).
-
-Each document is split into chunks and stored in a FAISS vector database. The chatbot in [src/chatbot/query_bot.py](src/chatbot/query_bot.py):
-
-- receives the user question
-- finds similar chunks from the vector store
-- retrieves the most relevant excerpts
-- returns the answer using the retrieved content
-
-#### Without OpenAI
-
-It returns the retrieved source excerpts directly.
-
-#### With OpenAI
-
-It generates a more natural answer in English or Hindi using the retrieved context as grounding.
-
----
-
-## 5.5 Dashboard output examples: what the user actually sees
-
-The app is not just a backend engine; it renders several decision-support views in a Streamlit dashboard. These are the real tab outputs the screenshots show.
-
-### 5.5.1 Cost comparison tab
-
-This tab is the main pricing comparison view. It displays a long-form table with columns like:
-
-- item_name
-- supplier_name
-- quantity
-- unit
-- unit_price
-- total_price
-- portion
-- packaging
-
-This is the raw itemized comparison output. A second visual table, called "Unit price by item × supplier", pivots the data so each supplier appears as a column per item. This is useful for quick comparison of price differences across suppliers.
-
-Example from the app:
-
-- Air Filter (OEM Specification): 355, 365, 350 across suppliers
-- Engine Mount Assembly (OEM Grade): 1,795, 1,810, 1,780
-- Shock Absorber: 2,125, 2,140, 2,100
-
-The app also shows a total cost summary table and a bar chart for total quoted cost per supplier. In the screenshot, the supplier with the lowest total cost is ranked first and highlighted as the cheapest overall option.
-
-### 5.5.2 Total quoted cost per supplier
-
-This section aggregates all item prices by supplier. The application groups all item totals by `supplier_name` and sums them into a total cost:
-
-- total_quoted_cost = sum of all item total_price values
-
-This creates the supplier ranking visible in the dashboard. The bar chart makes it easy to compare total costs visually, while the table also shows:
-
-- `savings_vs_cheapest`
-- `rank`
-
-This is important because a supplier may not be cheapest on every item but still be the best total value overall.
-
-### 5.5.3 Cheapest supplier per item
-
-This table identifies the lowest price supplier for each item. It is calculated by taking the minimum `unit_price` for each `item_name` and returning the supplier that supplied it.
-
-The result is a useful shortlist for negotiation and buyer discussions. In the screenshot, this section shows the best supplier for each item, along with quantity and total price for that specific item.
-
-### 5.5.4 Investment / cash outlay tab
-
-This tab uses payment-term interpretation to estimate the upfront financial burden. It reads payment terms such as "30% advance, balance on delivery" and calculates:
-
-- advance_payment_pct
-- upfront_cash_required
-- balance_on_delivery
-- delivery_lead_time_days
-
-If the app cannot clearly detect the percentage, it leaves the value as blank instead of guessing. This is intentional and reduces the chance of wrong financial estimates.
-
-The screenshot shows a table with columns like:
-
-- supplier_name
-- total_quoted_cost
-- payment_terms
-- advance_payment_pct
-- upfront_cash_required
-- balance_on_delivery
-- delivery_lead_time_days
-
-This is the real cash-flow view for procurement planning.
-
-### 5.5.5 Gap analysis tab
-
-This tab shows which supplier quote is most compliant with the RFQ. The app compares the RFQ items against each supplier quote and highlights missing information.
-
-The screenshot shows columns such as:
-
-- supplier_name
-- missing_items
-- missing_fields
-- items_missing_packaging
-- items_missing_portion
-- gap_score
-
-Example output from the app:
-
-- supplier with missing items like 1, 2, 3, 4, air filter, engine mount assembly, front brake disc, shock absorber
-- missing fields such as Delivery terms, Payment terms, Warranty, Delivery lead time
-- gap_score values such as 32 or 35
-
-Lower `gap_score` means the supplier is more compliant with the RFQ.
-
-### 5.5.6 Email tab
-
-This tab is used to draft a follow-up email when the supplier is missing required information.
-
-The screenshot demonstrates a real email workflow:
-
-- supplier selected
-- email type chosen (gap follow-up or award notification)
-- supplier email address entered
-- a generated Hindi subject and body with details of missing items and fields
-- "Send / Save draft" button appears
-
-This is where the app turns the analysis into action. Instead of a manual copy-paste workflow, the system prepares the message automatically using the RFQ reference and the missing gap details.
-
-### 5.5.7 Final Summary tab
-
-This tab combines the financial and compliance signals into a single decision-support ranking.
-
-The underlying logic is:
-
-- cost weight: 60%
-- RFQ compliance weight: 40%
-
-The app calculates a composite score and ranks the suppliers from best to worst. In the screenshot, the recommended supplier is the one with the lowest combined score.
-
-The result is shown as a table with columns such as:
-
-- supplier_name
-- total_quoted_cost
-- savings_vs_cheapest
-- rank
-- gap_score
-- composite_score
-
-The app also displays a recommendation banner such as:
-
-> Recommended supplier: ABC Automotive Pvt. Ltd. Company: Varroc Engineering Limited — lowest combined score of total cost (60% weight) and RFQ compliance/completeness (40% weight).
-
-This is explicitly described as a decision-support ranking, not an automatic award.
-
----
-
-## 6. Local mode vs API mode
+This project is maintained by Harshit Gautam.
 
 ### Local / no-key mode
 

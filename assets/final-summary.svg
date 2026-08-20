@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <style>
+      .bg { fill: #f2f4f7; }
+      .panel { fill: #ffffff; stroke: #dde3eb; }
+      .header { fill: #edf2f6; }
+      .text { font-family: Arial, sans-serif; fill: #27364a; }
+      .muted { fill: #64748b; }
+      .green { fill: #dff5e8; stroke: #a8d9b5; }
+    </style>
+  </defs>
+  <rect class="bg" width="1600" height="900"/>
+  <text x="70" y="70" class="text" style="font-size:36px;font-weight:700;">अंतिम सिफारिश</text>
+
+  <rect x="40" y="104" width="1515" height="240" rx="12" class="panel"/>
+  <rect x="40" y="104" width="1515" height="48" rx="12" class="header"/>
+  <text x="80" y="135" class="text" style="font-size:15px;font-weight:700;">supplier_name</text>
+  <text x="630" y="135" class="text" style="font-size:15px;font-weight:700;">total_quoted_cost</text>
+  <text x="950" y="135" class="text" style="font-size:15px;font-weight:700;">savings_vs_cheapest</text>
+  <text x="1180" y="135" class="text" style="font-size:15px;font-weight:700;">rank</text>
+  <text x="1290" y="135" class="text" style="font-size:15px;font-weight:700;">gap_score</text>
+  <text x="1415" y="135" class="text" style="font-size:15px;font-weight:700;">composite_score</text>
+
+  <g class="text" style="font-size:16px;">
+    <text x="80" y="195">ABC Automotive Pvt. Ltd. Company: Varroc Engineering Limited</text>
+    <text x="80" y="240">ABC Automotive Pvt. Ltd. Company: Talbros Automotive Components Ltd.</text>
+    <text x="80" y="285">ABC Automotive Pvt. Ltd. Company: Mahindra CIE Automotive Components</text>
+    <text x="630" y="195">5,366,050</text>
+    <text x="630" y="240">5,395,550</text>
+    <text x="630" y="285">5,681,700</text>
+    <text x="950" y="195">0</text>
+    <text x="950" y="240">29,500</text>
+    <text x="950" y="285">315,650</text>
+    <text x="1180" y="195">1</text>
+    <text x="1180" y="240">2</text>
+    <text x="1180" y="285">3</text>
+    <text x="1290" y="195">32</text>
+    <text x="1290" y="240">32</text>
+    <text x="1290" y="285">32</text>
+    <text x="1415" y="195">0</text>
+    <text x="1415" y="240">0</text>
+    <text x="1415" y="285">0</text>
+  </g>
+
+  <rect x="40" y="420" width="1515" height="140" rx="18" class="green"/>
+  <text x="70" y="492" class="text" style="font-size:25px;font-weight:700; color:#0d7a42;">Recommended supplier: ABC Automotive Pvt. Ltd. Company: Varroc Engineering Limited</text>
+  <text x="70" y="530" class="text" style="font-size:20px;">lowest combined score of total cost (60% weight) and RFQ compliance/completeness (40% weight).</text>
+
+  <text x="70" y="640" class="muted" style="font-size:18px;">This is a decision-support ranking, not an automatic award — always verify manually before formalizing an order.</text>
+</svg>

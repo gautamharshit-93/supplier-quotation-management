@@ -1,0 +1,14 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+data/uploads/*
+data/processed/*
+data/vector_index/*
+data/db/*
+!data/uploads/.gitkeep
+!data/processed/.gitkeep
+!data/vector_index/.gitkeep
+!data/db/.gitkeep
+.streamlit/secrets.toml
